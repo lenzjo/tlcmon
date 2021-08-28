@@ -6,25 +6,6 @@
 #*******************************************************************************
 
 cmd_dump          lda ARGCNT            # How many args?
-                  cmp #$01              # Only one?
-                  beq cdu_ishelp        #   Yes, go test for help
-
-                  cmp #$02              # Two args?
-                  beq cdu_getargs       #   Yes, go validate args
-
-cdu_bexit         jsr pr_err_arwr       #   No, Show err msg
-                  rts                   #   and exit
-
-cdu_ishelp        ldx ARG1              # Get ptr to Arg
-                  lda CMD_IBUF,x        # and the ch there
-                  cmp #HELPME           # Is it cmdhelp?
-                  ### if not HELPME then is it an addr?
-                  ###
-                  ###
-                  bne cdu_bexit         #   No, go err exit
-
-                  jsr pr_hlp_dump       #   Yes, show help for this cmd
-                  rts                   #   and exit
 
 cdu_getargs       ldx ARG1              # Get ptr to Arg1
                   jsr get_SRC_addr      # Attempt to get the addr
@@ -59,6 +40,7 @@ cdu_dfcnt         clc                   # UNTIL = SRC + $0100
 dump_blk          lda #$10							; 80 width = 16 bytes to show
                   sta BYTECNT
 cdu_do_row        ldy #$00              # Bytes per line ctr
+                  jsr pr_SPC
                   jsr pr_SRC_addr       # Print the addr '$xxxx'
 
                   jsr pr_SPC            # Put a SPC either side of the colon

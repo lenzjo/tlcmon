@@ -16,15 +16,17 @@
 # Cmds:
 #   peek                                - working 27/08/21 - v0.1.0
 #   poke                                - working 27/08/21 - v0.1.0
-#   dump
+#   dump                                - working 27/08/21 - v0.1.0
 #   copy
 #   fill
-#   go
-#   help
-#   dism
 #   conv
-#   prog
+#   memed
+#   go
+#   dism
+#   help                                - working 27/08/21 - v0.1.0
 #   xload
+#   prog
+#
 ###############################################################################
 
 #=-=-=-= TLCmon Version number =-=-=-=
@@ -159,7 +161,8 @@ NUMBASE           .EQ PGZERO_ST+26
 
 SRC               .EQ PGZERO_ST+40
 UNTIL             .EQ PGZERO_ST+42
-BYTE              .EQ PGZERO_ST+44
+DEST              .EQ PGZERO_ST+44
+BYTE              .EQ PGZERO_ST+46
 
 ###############################################################################
 #                 Buffers
@@ -217,7 +220,11 @@ cmd_loop          jsr pr_MonPrompt     # Show Prompt
 cmd_bad           jsr pr_err_nocmd      #   Else, show error msg
                   bra cmd_loop          #   and go retry.
 
-cmd_doit          jsr exec_cmd          # Execute the cmd line
+cmd_doit
+                  jsr pr_cmd_help       # Was 1st arg = help?
+                  bcs cmd_loop          #   Yes, then go get next cmd
+
+                  jsr exec_cmd          # Execute the cmd line
 
                   bra cmd_loop          # then go get the next cmd line.
 
@@ -342,19 +349,20 @@ pr_COLON          lda #COLON
 #                 COMMANDS functions
 ###############################################################################
 
-                  .IN cmds/cmd_help.inc
+
                   .IN cmds/cmd_peek.inc
                   .IN cmds/cmd_poke.inc
                   .IN cmds/cmd_dump.inc
 
+                  .IN cmds/cmd_help.inc
+
 
 cmd_copy          rts
 cmd_fill          rts
+cmd_hexdec        rts
 cmd_memed         rts
 cmd_go            rts
 cmd_dism          rts
-cmd_hexdec        rts
-cmd_help          rts
 
 
 ###############################################################################

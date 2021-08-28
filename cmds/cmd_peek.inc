@@ -5,18 +5,13 @@
 
 cmd_peek          lda ARGCNT            # How many args?
                   cmp #$01              # Expect only one
-                  beq cpe_args          #   Yes, go get 'em
+                  beq cpe_arg           #   Yes, go get 'em
 
                   jsr pr_err_arwr       #   No, Show err msg
                   rts                   #   and exit
 
-cpe_args          ldx ARG1              # Get ptr to Arg
+cpe_arg           ldx ARG1              # Get ptr to Arg
                   lda CMD_IBUF,x        # and the ch there
-                  cmp #HELPME           # Is it cmdhelp?
-                  bne cpe_num           #   No, go test for an addr
-
-                  jsr pr_hlp_peek       #   Yes, show help for this cmd
-                  rts                   #   and exit
 
 cpe_num           jsr get_SRC_addr      # Attempt to get the addr
                   bcs cpe_peek          #   Yes, go do cmd

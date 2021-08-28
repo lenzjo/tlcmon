@@ -165,15 +165,14 @@ gnap_loop         lda CMD_IBUF,x        # Get cmd line chr
 gnap_isalpha      jsr is_alphanumeric   # Is it AlphaNumeric (A-Z, a-z, 0-9)?
                   bcs gnap_gexit        #   Yes, found 1st ch of ARG, go good exit
 
-gnap_ishash       cmp #HASH             # Is it a # ?
+                  cmp #HASH             # Is it a # ?
                   beq gnap_gexit        #   Yes, go good exit
 
                   cmp #DOLLAR           # Is it a $ ?
                   beq gnap_gexit        #   Yes, go good exit
 
-                  cmp #'?'              # Is it a ? ?
+                  cmp #HELPME           # Is it a ? ?
                   beq gnap_gexit        #   Yes, go good exit
-
 
 gnap_bexit        clc                   # Anything that get's to here is an illegal ch
                   rts
@@ -182,8 +181,8 @@ gnap_gexit        sec                   # Good exit, ARG found
                   rts
 
 
-find_next_SPC     lda CMD_IBUF,x						; Get cmd line chr
-                  beq fis_bexit						; It's a NULL - EOL go exit
+find_next_SPC     lda CMD_IBUF,x        # Get cmd line chr
+                  beq fis_bexit         # It's a NULL - EOL go exit
 
                   jsr is_seperator
                   bcs fis_gexit
@@ -195,9 +194,6 @@ fis_bexit         clc
 
 fis_gexit         sec
                   rts
-
-
-
 
 
 #*******************************************************************************
@@ -226,6 +222,21 @@ get_UNTIL_addr    jsr get_ASC_number    # Attempt to get a number
                   rts                   #   No, exit
 
 gua_mvnum         >CPYW HEX_RES,UNTIL   # Copy to UNTIL
+                  sec
+                  rts
+
+
+#*******************************************************************************
+#                 Get DEST addr
+#                 sec=Yes, clc=No
+#*******************************************************************************
+
+get_DEST_addr     jsr get_ASC_number    # Attempt to get a number
+                  bcs gda_mvnum         #   Yes, go move it
+
+                  rts                   #   No, exit
+
+gda_mvnum         >CPYW HEX_RES,DEST    # Copy to DEST
                   sec
                   rts
 

@@ -42,7 +42,7 @@ MonPrompt         .DB 'tlc> ',NULL
 
 put_str           sta MSG_PTR
                   sty MSG_PTR+1
-                  ldy #$00
+pr_str            ldy #$00
 pes_loop          lda (MSG_PTR),y       # Get the next char in the string
                   beq pes_exit          #   NULL means the end
 

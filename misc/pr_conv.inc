@@ -125,6 +125,9 @@ gad_bexit         clc                   # clc = failure
 
 #*******************************************************************************
 #                 Convert an ASCII Hex number on the cmd line to binary
+#                 On Exit:
+#                   Result in HEX_RES and HEX_RES+1
+#                   sec = Success, clc = Failure
 #*******************************************************************************
 
 get_ASC_hex       stz HEX_RES           # clear the result regs
@@ -163,7 +166,9 @@ gah_bexit         clc                   # clc = failure
 
 #*******************************************************************************
 #                 Conv ASC to hex nibble.
-#                 On Exit: clc = ERR, sec = Valid, A = number
+#                 On Exit:
+#                   clc = ERR, sec = Valid
+#                   A = number
 #*******************************************************************************
 
 get_ASC_nybl      sec

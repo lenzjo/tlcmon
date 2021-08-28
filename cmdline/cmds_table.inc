@@ -40,6 +40,9 @@ VALID_CMDS
                   #====  Fill memory range src-until with DB
                   .DB "FILL", NULL, NULL, NULL, NULL              # fill src,until,dbyte
 
+                  #====  Convert a number from one base to another
+                  .DB "HEXDEC", NULL, NULL                        # hexnum [$]n[n..]
+
                   #====  Edit memory starting at addr
                   .DB "MEMED", NULL, NULL, NULL                   # memed addr
 
@@ -52,8 +55,7 @@ VALID_CMDS
                   #====  Display help page
                   .DB "HELP", NULL, NULL, NULL, NULL              # help
 
-                  #====  Convert a number from one base to another
-                  .DB "HEXDEC", NULL, NULL                        # hexnum [$]n[n..]
+
 
                   .DB NULL                                        # Cmd-Table end-marker is a NULL
 
