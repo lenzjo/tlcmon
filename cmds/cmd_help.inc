@@ -11,8 +11,7 @@ HLP_DUMP          .DB 'dump addr,dest         - Show hex-dump from addr, for 128
 
 HLP_COPY          .DB 'copy addr,until dest   - Copy blk from-until to dest.', CR, LF, NULL
 HLP_FILL          .DB 'fill addr,until byte   - Fill blk from-until with byte.', CR, LF, NULL
-HLP_HEXDEC        .DB 'conv [$|%]n[,$|%]      - Convert num from one base to another.', CR, LF, NULL
-HLP_MEMED         .DB 'memed addr             - Line edit mem from addr.', CR, LF, NULL
+HLP_CONV          .DB 'conv [$|%]n[,$|%]      - Convert num from one base to another.', CR, LF, NULL
 HLP_GO            .DB 'go addr                - Run code starting at addr.', CR, LF, NULL
 HLP_DISM          .DB 'dism addr,until        - Disassemble mem blk addr-until.', CR, LF, NULL
 HLP_HELP          .DB 'help                   - Show this help page.', CR, LF, NULL
@@ -26,9 +25,8 @@ HELP_MSG_TABLE    .DW HLP_PEEK
 
                   .DW HLP_COPY
                   .DW HLP_FILL
-                  .DW HLP_HEXDEC
+                  .DW HLP_CONV
 
-                  .DW HLP_MEMED
                   .DW HLP_GO
                   .DW HLP_DISM
 
@@ -49,11 +47,9 @@ cmd_help          >CPYMSPTR HLP_HDR
                   jsr put_str
                   >CPYMSPTR HLP_FILL
                   jsr put_str
-                  >CPYMSPTR HLP_HEXDEC
+                  >CPYMSPTR HLP_CONV
                   jsr put_str
 
-                  >CPYMSPTR HLP_MEMED
-                  jsr put_str
                   >CPYMSPTR HLP_GO
                   jsr put_str
                   >CPYMSPTR HLP_DISM

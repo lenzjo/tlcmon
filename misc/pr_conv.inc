@@ -53,6 +53,75 @@ get_ASC_number    lda CMD_IBUF,x        # Get a chr
 gan_getHEX        jmp get_ASC_hex
 
 
+********************************************************************************
+#                 Convert an ASCII decimal number on the cmd line to binary
+#                 On Exit:
+#                   Result in HEX_RES and HEX_RES+1
+#                   sec = Success, clc = Failure
+#*******************************************************************************
+
+get_ASC_dec       stz HEX_RES           # Clear result regs
+                  stz HEX_RES+1
+                  dex
+
+gad_next_digit    inx
+                  lda CMD_IBUF,x        # Get a chr
+                  cmp #SPC              # End of #?
+                  beq gad_gexit         #   Yes, then exit
+
+                  cmp #COMMA            # End of #?
+                  beq gad_gexit         #   Yes, then exit
+
+                  cmp #NULL             # End of cmd?
+                  beq gad_gexit         #   Yes, then exit
+
+                  jsr is_numeric        # Is it numeric?
+                  bcc gad_bexit         #   No, then err exit
+
+                  and #$0F              # Convert to binary
+                  jsr multx10           # mult HEX_RES x 10
+
+                  clc
+                  adc HEX_RES           # and add new number to HEX_RES
+                  sta HEX_RES
+                  bcc gad_next_digit    # If no carry go get next digit
+
+                  inc HEX_RES+1         # There's a carry so add 1 to hi-byte
+                  jmp gad_next_digit
+
+gad_gexit         sec                   # sec = success
+                  rts
+
+gad_bexit         clc                   # clc = failure
+                  rts
+
+
+#*******************************************************************************
+#                 Multiply HEX_RES by 10
+#*******************************************************************************
+
+multx10           php
+                  pha
+                  asl HEX_RES           # Mult by 2
+                  rol HEX_RES+1
+                  lda HEX_RES+1         # Save a copy of HEX_RES
+                  pha                   # multiplied by 2
+                  lda HEX_RES
+                  asl HEX_RES           # Now mult by 8
+                  rol HEX_RES+1         # since HEX_RES has already
+                  asl HEX_RES           # been mult by 2
+                  rol HEX_RES+1         # A simple mult by 4 gives
+                  clc
+                  adc HEX_RES           # Add in 2x to 8x
+                  sta HEX_RES           # to get 10x
+                  pla
+                  adc HEX_RES+1
+                  sta HEX_RES+1
+                  pla
+                  plp
+                  rts
+
+
 #*******************************************************************************
 #                 Get a number in range 0-255
 #*******************************************************************************
@@ -71,56 +140,6 @@ gby_gexit         lda HEX_RES
 gby_bexit         clc
                   rts
 
-
-********************************************************************************
-#                 Convert an ASCII decimal number on the cmd line to binary
-#                 On Exit:
-#                   Result in HEX_RES and HEX_RES+1
-#                   sec = Success, clc = Failure
-#*******************************************************************************
-
-get_ASC_dec       stz HEX_RES           # Clear result regs
-                  stz HEX_RES+1
-                  lda #ISDEC
-                  sta NUMBASE
-gad_next_digit    lda CMD_IBUF,x         # Get a chr
-                  cmp #SPC              # End of #?
-                  beq gad_gexit         #   Yes, then exit
-
-                  cmp #COMMA            # End of #?
-                  beq gad_gexit         #   Yes, then exit
-
-                  cmp #NULL             # End of cmd?
-                  beq gad_gexit         #   Yes, then exit
-
-                  jsr is_numeric        # Is it numeric?
-                  bcc gad_bexit         #   No, then err exit
-
-                  and #$0F              # Convert to binary
-                  pha                   #   and save temporarily
-
-                  >CPYW HEX_RES,TEMP    # Save current result
-
-                  # This bit multiplies the curr result by 10
-                  >MULTW2 HEX_RES       #   Multiply by 2
-                  >MULTW2 HEX_RES       #   Multiply by 2 again
-                  >ADDW HEX_RES,TEMP    #   Add original #w
-                  >MULTW2 HEX_RES       #   Multiply by 2
-                  pla                   # Get new #
-                  clc                   #   and add it to the last result
-                  adc HEX_RES
-                  sta HEX_RES
-                  lda #$00
-                  adc HEX_RES+1
-                  sta HEX_RES+1
-                  inx                   # Inc line ptr
-                  jmp gad_next_digit
-
-gad_gexit         sec                   # sec = success
-                  rts
-
-gad_bexit         clc                   # clc = failure
-                  rts
 
 
 #*******************************************************************************

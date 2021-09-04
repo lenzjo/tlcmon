@@ -109,6 +109,12 @@ pr_err_inuadr     >CPYMSPTR ERR_INUADR
                   jsr pr_err_msg
                   rts
 
+                  # Print Invalid Dest Addr Err msg
+pr_err_indadr     >CPYMSPTR ERR_INDADR
+                  jsr pr_err_msg
+                  rts
+
+
 #*******************************************************************************
 #                 Print System Messages
 #*******************************************************************************

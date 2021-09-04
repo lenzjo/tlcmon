@@ -20,19 +20,21 @@
 #   copy
 #   fill
 #   conv
-#   memed
-#   go
+#   go                                  - working 29/08/21 - v0.1.0
 #   dism
 #   help                                - working 27/08/21 - v0.1.0
 #   xload
 #   prog
 #
+# MISC:
+#   Pwr LED                             - working 03/09/21 - v0.1.0
+#
 ###############################################################################
 
 #=-=-=-= TLCmon Version number =-=-=-=
 VerMaj            .EQ 0
-VerMin            .EQ 0
-VerMnt            .EQ 4
+VerMin            .EQ 1
+VerMnt            .EQ 0
 
 
 #=-=-=-= Memory starts & limits =-=-=-=
@@ -132,37 +134,53 @@ MSG_PTR           .EQ PGZERO_ST+2       # Message pointer for I/O functions (2)
 
 
 #=-=-=-= RTC stuff =-=-=-=
-JIFFIES           .EQ PGZERO_ST+4       # 100ths of seconds
-SECONDS           .EQ PGZERO_ST+5       # cnt of secs.
-MINUTES           .EQ PGZERO_ST+6       # cnt of mins.
-HOURS             .EQ PGZERO_ST+7       # cnt of hours
-SHOWTIME          .EQ PGZERO_ST+8       # display time flag
+JIFFIES           .EQ PGZERO_ST+4       # 100ths of seconds - (0-99)
+SECONDS           .EQ PGZERO_ST+5       # cnt of secs       - (0-59)
+MINUTES           .EQ PGZERO_ST+6       # cnt of mins       - (0-59)
+HOURS             .EQ PGZERO_ST+7       # cnt of hrs        - (0-23)
+DAYSL             .EQ PGZERO_ST+8       # Days: low-order byte 0-65535
+DAYSH             .EQ PGZERO_ST+9       # Days: hi-order byte >179 Years
 
-BUFLEN            .EQ PGZERO_ST+9
-BUFIDX            .EQ PGZERO_ST+10
+#=-=-=-= Delay Timer variables =-=-=-=
+MSDELAY           .EQ PGZERO_ST+10     # Timer delay countdown byte (255 > 0)
+SETMS             .EQ PGZERO_ST+11     # Set timeout for delay routines - BIOS use only
+DELLO             .EQ PGZERO_ST+12     # Delay value BIOS use only
+DELHI             .EQ PGZERO_ST+13     # Delay value BIOS use only
+XDL               .EQ PGZERO_ST+14     # XL Delay count
+
+
+#=-=-=-= Count variables for 10ms benchmark timing =-=-=-=
+MS10_CNT          .EQ PGZERO_ST+15     # 10ms Count variable
+SECL_CNT          .EQ PGZERO_ST+16     # Seconds Low byte count
+SECH_CNT          .EQ PGZERO_ST+17     # Second High byte count
+
+
+BUFLEN            .EQ PGZERO_ST+18
+BUFIDX            .EQ PGZERO_ST+19
 
 
 #=-=-=-= CMD_IBUFF regs =-=-=-=
-THISCMD           .EQ PGZERO_ST+11      # cmd index ptr
-ARG1              .EQ PGZERO_ST+12      # ptr to 1st arg on cmd line
-ARG2              .EQ PGZERO_ST+13      # ptr to 2nd arg on cmd line
-ARG3              .EQ PGZERO_ST+14      # ptr to 3rd arg on cmd line
-ARG4              .EQ PGZERO_ST+15      # ptr to 4th arg on cmd line
-ARGCNT            .EQ PGZERO_ST+16      # how many args on cmd line
-CMDXPTR           .EQ PGZERO_ST+17      # Holds the x ptr for the CMD_IBUFF
+THISCMD           .EQ PGZERO_ST+20      # cmd index ptr
+ARG1              .EQ PGZERO_ST+21      # ptr to 1st arg on cmd line
+ARG2              .EQ PGZERO_ST+22      # ptr to 2nd arg on cmd line
+ARG3              .EQ PGZERO_ST+23      # ptr to 3rd arg on cmd line
+ARG4              .EQ PGZERO_ST+24      # ptr to 4th arg on cmd line
+ARGCNT            .EQ PGZERO_ST+25      # how many args on cmd line
+CMDXPTR           .EQ PGZERO_ST+26      # Holds the x ptr for the CMD_IBUFF
 
 
-ASCBYTE           .EQ PGZERO_ST+20      # 2 BYTEs
-HEX_RES           .EQ PGZERO_ST+22      # 2 BYTEs for hex results
-TEMP              .EQ PGZERO_ST+24      # 2 BYTEs
-BYTECNT           .EQ PGZERO_ST+26
-NUMBASE           .EQ PGZERO_ST+26
+ASCBYTE           .EQ PGZERO_ST+27      # 2 BYTEs
+HEX_RES           .EQ PGZERO_ST+28      # 2 BYTEs for hex results
+TEMP              .EQ PGZERO_ST+29      # 2 BYTEs
+BYTECNT           .EQ PGZERO_ST+30
+NUMBASE           .EQ PGZERO_ST+31
 
 
 SRC               .EQ PGZERO_ST+40
 UNTIL             .EQ PGZERO_ST+42
 DEST              .EQ PGZERO_ST+44
 BYTE              .EQ PGZERO_ST+46
+LED_STATE         .EQ PGZERO_ST+47
 
 ###############################################################################
 #                 Buffers
@@ -185,7 +203,12 @@ ASCIIDUMP         .EQ $400              # text formatting area for dump cmd.
 #                 Start of rom - (Using only top half of 32K EEPROM)
 ###############################################################################
                   .OR $8000
-                  .DW $1234
+                  .DW $FFFF
+
+                  lda #$aa
+                  sta $00
+                  rts
+
 
 ###############################################################################
 #                 Start of TLCmon
@@ -204,7 +227,9 @@ pgz_lp            stz $00,x             # clr page zero
 
                   jsr iniz_intvec       # Setup interrupt vector table
                   jsr inizACIA          # Setup uart
+                  jsr iniz_VIA1         # Setup VIA1
 
+                  jsr copy_code         # temp test for go cmd##################
                   cli                   # clear interrupts
 
                   jsr pr_MonHeader     # Show Header
@@ -265,6 +290,13 @@ get_c             jsr ACIA1_get_c
 
 #                  .IN misc/output_fun.inc
 
+
+###############################################################################
+#                 VIA1 stuff
+###############################################################################
+
+                  .IN devs/VIA1_fun.inc
+
 ###############################################################################
 #               Interrupt stuff
 ###############################################################################
@@ -280,6 +312,7 @@ get_c             jsr ACIA1_get_c
 ###############################################################################
 
                   .IN devs/ACIA1_int_fun.inc
+                  .IN devs/VIA1_int_fun.inc
 
 
 ###############################################################################
@@ -353,15 +386,15 @@ pr_COLON          lda #COLON
                   .IN cmds/cmd_peek.inc
                   .IN cmds/cmd_poke.inc
                   .IN cmds/cmd_dump.inc
+                  .IN cmds/cmd_copy.inc
+
+                  .IN cmds/cmd_go.inc
 
                   .IN cmds/cmd_help.inc
 
 
-cmd_copy          rts
 cmd_fill          rts
-cmd_hexdec        rts
-cmd_memed         rts
-cmd_go            rts
+cmd_conv          rts
 cmd_dism          rts
 
 
