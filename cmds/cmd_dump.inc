@@ -36,8 +36,9 @@ cdu_dfcnt         clc                   # UNTIL = SRC + $0100
 #*******************************************************************************
 # Alternate Entry Point: If SRC and UNTIL contain valid address's
 #*******************************************************************************
-
-dump_blk          lda #$10							; 80 width = 16 bytes to show
+                  >CPYMSPTR dump_hdr    # Print dump header
+                  jsr put_str
+dump_blk          lda #$10							# 80 col width = 16 bytes to show
                   sta BYTECNT
 cdu_do_row        ldy #$00              # Bytes per line ctr
                   jsr pr_SPC
@@ -104,3 +105,6 @@ pad_cont          jsr pr_SPC
                   jsr put_str
                   jsr pr_CRLF
                   rts
+
+dump_hdr          .DB "  ADDR | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F | 0123456789ABCDEF", CR, LF
+                  .DB "---------------------------------------------------------------------------",CR, LF, NULL

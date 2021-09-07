@@ -4,7 +4,7 @@
 
 ###############################################################################
 #
-#	My monitor/os kernal for the modified RC6502 sbc
+#	My monitor/os for my TLC6502 SBC
 #
 #	ACIA functionality                    - working 28/04/21 - v0.0.1
 #	ACIA Int. & Int Vector Table          - working 29/04/21 - v0.0.2
@@ -27,7 +27,7 @@
 #   prog
 #
 # MISC:
-#   Pwr LED                             - working 03/09/21 - v0.1.0
+#   Interrupt LED                       - working 03/09/21 - v0.1.0
 #
 ###############################################################################
 
