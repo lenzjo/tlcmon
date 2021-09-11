@@ -36,9 +36,9 @@ cdu_dfcnt         clc                   # UNTIL = SRC + $0100
 #*******************************************************************************
 # Alternate Entry Point: If SRC and UNTIL contain valid address's
 #*******************************************************************************
-                  >CPYMSPTR dump_hdr    # Print dump header
+dump_blk          >CPYMSPTR dump_hdr    # Print dump header
                   jsr put_str
-dump_blk          lda #$10							# 80 col width = 16 bytes to show
+                  lda #$10							# 80 col width = 16 bytes to show
                   sta BYTECNT
 cdu_do_row        ldy #$00              # Bytes per line ctr
                   jsr pr_SPC
@@ -92,6 +92,7 @@ cdu_fill_gap      iny
                   bra cdu_fill_gap
 
 cdu_last_ASC_dump jsr pr_ASC_dump
+                  jsr pr_CRLF
                   rts
 
 

@@ -76,6 +76,28 @@ CMPAD             .MA MEMA, MEMB
                 .EM
 
 
+;====  Is MEMA > MEMB, on exit TRUE= bcs, FALSE= beq  ===
+CMPA1GTA2         .MA MEMA, MEMB
+                  lda ]1+1
+                  cmp ]2+1
+                  bcs :CZ_EXIT
+                  lda ]1
+                  cmp ]2
+:CZ_EXIT
+                  .EM
+
+
+#==== Is MEMA =< MEMB, on exit TRUE = beq + bcc, FALSE = bne
+CMPAEQLTB         .MA MEMA, MEMB
+                  lda ]1+1
+                  cmp ]2+1
+                  bne :CEL_EXIT
+                  lda ]1
+                  cmp ]2
+:CEL_EXIT
+                  .EM
+
+
 ;====  Compare two numbers  ===
 CMPVAL            .MA ADDR, VAL
                   lda ]1
@@ -129,11 +151,11 @@ SUBA              .MA ADDR,VAL
 
 
 ;====  Subtract two mem regs and save in 1st
-SUBW              .MA MEMA,MEMB
+SUBW              .MA MEMA,MEMB,RESULT
                   sec
                   lda ]1
                   sbc ]2
-                  sta ]1
+                  sta ]3
                   lda ]1+1
                   sbc ]2+1
-                  sta ]1+1
+                  sta ]3+1

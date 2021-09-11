@@ -10,7 +10,7 @@ ERR_INSADR        .DB "Invalid Start address.", CR, LF, NULL
 ERR_ROM           .DB "Cannot change EEPROM.", CR, LF, NULL
 ERR_LGN           .DB "Byte out of range (0-255).", CR, LF, NULL
 ERR_INUADR        .DB "Invalid Until address.", CR, LF, NULL
-
+ERR_EQADR         .DB "Destination same as Source.", CR, LF, NULL
 
 ERR_DVN           .DB "Unknown device Name.", CR, LF, NULL
 ERR_CHO           .DB "Channel is already open.", CR, LF, NULL
@@ -29,7 +29,8 @@ ERR_CHNOP         .DB "Not able to open a channel.", CR, LF, NULL
 #                 System Messages
 #*******************************************************************************
 
-MonHeader         .DB 'TLCmon 6502 SBC by Clive Thomas (c) 2021 version '
+MonHeader         .DB ESC,'[2J'
+                  .DB 'TLCmon 6502 SBC by Clive Thomas (c) 2021 version '
                   .DB $30+VerMaj,'.',$30+VerMin,'.',$30+VerMnt
                   .DB CR, LF, CR, LF, NULL
 
@@ -109,12 +110,19 @@ pr_err_inuadr     >CPYMSPTR ERR_INUADR
                   jsr pr_err_msg
                   rts
 
+
                   # Print Invalid Dest Addr Err msg
 pr_err_indadr     >CPYMSPTR ERR_INDADR
                   jsr pr_err_msg
                   rts
 
 
+                  # Print src = dest
+pr_err_eqadr      >CPYMSPTR ERR_EQADR
+                  jsr pr_err_msg
+                  rts
+
+                  
 #*******************************************************************************
 #                 Print System Messages
 #*******************************************************************************

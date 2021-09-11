@@ -15,12 +15,6 @@
 #====  until,
 #====  dest	: addr
 #====  dbyte	: $n[n] | n[n..] in range 0-255
-#====  file	: A file on the SD
-#====  ch	: n
-#====  file	: x[a..7].ext
-#====  chname	: x[a.7]
-#====  dev	: V | K | R | S | I | D | P
-#====  dir	: r | w | rw
 
 
 # COMMANDS FORMAT
@@ -41,10 +35,7 @@ VALID_CMDS
                   .DB "FILL", NULL, NULL, NULL, NULL              # fill src,until,dbyte
 
                   #====  Convert a number from one base to another
-                  .DB "HEXDEC", NULL, NULL                        # hexnum [$]n[n..]
-
-                  #====  Edit memory starting at addr
-                  .DB "MEMED", NULL, NULL, NULL                   # memed addr
+                  .DB "CONV", NULL, NULL, NULL, NULL              # hexnum [$]n[n..]
 
                   #====  Execute code at location addr
                   .DB "GO", NULL, NULL, NULL, NULL, NULL, NULL    # exec addr
@@ -61,11 +52,11 @@ VALID_CMDS
 
 VALID_ARGCNT
                   .DB 1
-                  .DB 2
+                  .DB 1
                   .DB 2
                   .DB 3
                   .DB 3
-                  .DB 1
                   .DB 2
                   .DB 1
+                  .DB 2
                   .DB 1

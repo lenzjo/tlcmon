@@ -17,12 +17,13 @@
 #   peek                                - working 27/08/21 - v0.1.0
 #   poke                                - working 27/08/21 - v0.1.0
 #   dump                                - working 27/08/21 - v0.1.0
-#   copy
+#   copy                                - working 11,09/21 - v0.1.0
 #   fill
 #   conv
 #   go                                  - working 29/08/21 - v0.1.0
 #   dism
 #   help                                - working 27/08/21 - v0.1.0
+#
 #   xload
 #   prog
 #
@@ -104,7 +105,7 @@ USER_VECTOR       .EQ R01_PTR+14
 
 BIOS_PG0           .EQ $80
 
-#=-=-=-= 2691 IRQ handler pointers and status =-=-=-=
+#=-=-=-= UART IRQ handler pointers and status =-=-=-=
 UART_ICNT         .EQ BIOS_PG0+01       # Input buffer count
 UART_IHEAD        .EQ BIOS_PG0+02       # Input buffer head pointer
 UART_ITAIL        .EQ BIOS_PG0+03       # Input buffer tail pointer
@@ -115,8 +116,8 @@ UART_OTAIL        .EQ BIOS_PG0+06       # Output buffer tail pointer
 
 #=-=-=-= Keyboard Buffer Pointers =-=-=-=
 KYBD_ICNT         .EQ BIOS_PG0+07       # Character count in buffer
-KYBD_IHEAD        .EQ BIOS_PG0+08       # Rx head ptr
-KYBD_ITAIL        .EQ BIOS_PG0+09       # Rx tail ptr
+KYBD_IHEAD        .EQ BIOS_PG0+08       # Input head ptr
+KYBD_ITAIL        .EQ BIOS_PG0+09       # Input tail ptr
 
 #=-=-=-= Misc Stuff =-=-=-=
 ACIA_ControlRam   .EQ BIOS_PG0+10
@@ -179,8 +180,9 @@ NUMBASE           .EQ PGZERO_ST+31
 SRC               .EQ PGZERO_ST+40
 UNTIL             .EQ PGZERO_ST+42
 DEST              .EQ PGZERO_ST+44
-BYTE              .EQ PGZERO_ST+46
-LED_STATE         .EQ PGZERO_ST+47
+LEN               .EQ PGZERO_ST+46
+BYTE              .EQ PGZERO_ST+48
+LED_STATE         .EQ PGZERO_ST+49
 
 ###############################################################################
 #                 Buffers
@@ -203,11 +205,7 @@ ASCIIDUMP         .EQ $400              # text formatting area for dump cmd.
 #                 Start of rom - (Using only top half of 32K EEPROM)
 ###############################################################################
                   .OR $8000
-                  .DW $FFFF
-
-                  lda #$aa
-                  sta $00
-                  rts
+                  .DB "TLC Stuff (c) MMXXI"
 
 
 ###############################################################################
@@ -229,7 +227,8 @@ pgz_lp            stz $00,x             # clr page zero
                   jsr inizACIA          # Setup uart
                   jsr iniz_VIA1         # Setup VIA1
 
-                  jsr copy_code         # temp test for go cmd##################
+                  jsr fillmem           # temp test for copy cmd################
+
                   cli                   # clear interrupts
 
                   jsr pr_MonHeader     # Show Header
@@ -262,6 +261,18 @@ cmd_doit
 
 
                   .IN misc/ch_fun.inc
+
+
+fillmem           stz SRC               # setup src addr $1000
+                  lda #$10
+                  sta SRC+1
+                  ldy #0
+                  lda #0
+flmm_loop         sta (SRC),y
+                  inc a
+                  iny
+                  bne flmm_loop
+flmm_exit         rts
 
 
 ###############################################################################
@@ -387,15 +398,11 @@ pr_COLON          lda #COLON
                   .IN cmds/cmd_poke.inc
                   .IN cmds/cmd_dump.inc
                   .IN cmds/cmd_copy.inc
-
+                  .IN cmds/cmd_fill.inc
+                  .IN cmds/cmd_conv.inc
                   .IN cmds/cmd_go.inc
-
+                  .IN cmds/cmd_dism.inc
                   .IN cmds/cmd_help.inc
-
-
-cmd_fill          rts
-cmd_conv          rts
-cmd_dism          rts
 
 
 ###############################################################################
