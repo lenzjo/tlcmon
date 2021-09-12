@@ -11,6 +11,7 @@ ERR_ROM           .DB "Cannot change EEPROM.", CR, LF, NULL
 ERR_LGN           .DB "Byte out of range (0-255).", CR, LF, NULL
 ERR_INUADR        .DB "Invalid Until address.", CR, LF, NULL
 ERR_EQADR         .DB "Destination same as Source.", CR, LF, NULL
+ERR_INVBYT        .DB "Missing or invalid byte.", CR, LF, NULL
 
 ERR_DVN           .DB "Unknown device Name.", CR, LF, NULL
 ERR_CHO           .DB "Channel is already open.", CR, LF, NULL
@@ -119,6 +120,11 @@ pr_err_indadr     >CPYMSPTR ERR_INDADR
 
                   # Print src = dest
 pr_err_eqadr      >CPYMSPTR ERR_EQADR
+                  jsr pr_err_msg
+                  rts
+
+                  # Print Invalid or missing byte
+pr_err_invbyt     >CPYMSPTR ERR_INVBYT
                   jsr pr_err_msg
                   rts
 

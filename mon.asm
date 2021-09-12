@@ -17,8 +17,8 @@
 #   peek                                - working 27/08/21 - v0.1.0
 #   poke                                - working 27/08/21 - v0.1.0
 #   dump                                - working 27/08/21 - v0.1.0
-#   copy                                - working 11,09/21 - v0.1.0
-#   fill
+#   copy                                - working 11/09/21 - v0.1.0
+#   fill                                - working 12/09/21 - v0.1.0
 #   conv
 #   go                                  - working 29/08/21 - v0.1.0
 #   dism
