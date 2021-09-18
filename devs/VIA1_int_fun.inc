@@ -25,9 +25,30 @@ vfi_exit          bne vc_next_irq       #   No, then exit
 
 ld_off            stz LED_STATE         #   Yes, Turn off led
                   stz VIA1_ORB
-                  bra vc_next_irq
+                  bra update_time
 
 ld_on             lda #1                # Turn it on
                   sta LED_STATE
                   sta VIA1_ORB
+#                  bra update_time
+
+update_time       inc SECONDS           # INC seconds
+                  lda SECONDS
+                  cmp #60               # Reached 1 min yet?
+                  bne vc_next_irq       # If not, done for now
+
+                  stz SECONDS           # Reset SECONDS
+                  inc MINUTES           # INC minutes
+                  lda MINUTES
+                  cmp #60               # Reached 1 hour yet?
+                  bne vc_next_irq
+
+                  stz MINUTES           # Reset MINUTES
+                  inc HOURS             # INC hours
+                  lda HOURS
+                  cmp #24               # Reached 24 hours yet?
+                  bne vc_next_irq
+
+                  stz HOURS             # Reset HOURS
+                  >INCW DAYS
                   bra vc_next_irq

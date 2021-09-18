@@ -36,7 +36,7 @@ cfo_start         sec                   # how many bytes to fill?
                   lda UNTIL+1
                   sbc SRC+1
                   sta LEN+1
-                  INCW LEN
+                  >INCW LEN
 
 cfo_loop          lda LEN+1             # Filled all bytes yet?
                   bne cfo_fillit        #   No, then go fill byte

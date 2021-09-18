@@ -24,6 +24,7 @@
 #   dism
 #   help                                - working 27/08/21 - v0.1.0
 #
+#   uptime                              - working 12/09/21 - v0.1.0
 #   xload
 #   prog
 #
@@ -139,7 +140,7 @@ JIFFIES           .EQ PGZERO_ST+4       # 100ths of seconds - (0-99)
 SECONDS           .EQ PGZERO_ST+5       # cnt of secs       - (0-59)
 MINUTES           .EQ PGZERO_ST+6       # cnt of mins       - (0-59)
 HOURS             .EQ PGZERO_ST+7       # cnt of hrs        - (0-23)
-DAYSL             .EQ PGZERO_ST+8       # Days: low-order byte 0-65535
+DAYS              .EQ PGZERO_ST+8       # Days: low-order byte 0-65535
 DAYSH             .EQ PGZERO_ST+9       # Days: hi-order byte >179 Years
 
 #=-=-=-= Delay Timer variables =-=-=-=
@@ -403,6 +404,7 @@ pr_COLON          lda #COLON
                   .IN cmds/cmd_go.inc
                   .IN cmds/cmd_dism.inc
                   .IN cmds/cmd_help.inc
+                  .IN cmds/cmd_uptime.inc
 
 
 ###############################################################################

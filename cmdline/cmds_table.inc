@@ -46,6 +46,9 @@ VALID_CMDS
                   #====  Display help page
                   .DB "HELP", NULL, NULL, NULL, NULL              # help
 
+                  #==== Uptime show time elapsed since turn-on
+                  .DB "UPTIME", NULL, NULL                        # uptime
+
 
 
                   .DB NULL                                        # Cmd-Table end-marker is a NULL
@@ -60,3 +63,4 @@ VALID_ARGCNT
                   .DB 1
                   .DB 2
                   .DB 1
+                  .DB 0

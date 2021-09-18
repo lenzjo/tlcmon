@@ -8,3 +8,4 @@ CMD_JUMP_TABLE
                   .DW cmd_go
                   .DW cmd_dism
                   .DW cmd_help
+                  .DW cmd_uptime

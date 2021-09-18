@@ -23,3 +23,9 @@ iniz_VIA1         lda  VIA1_ACR         # Clear the ACR's bit that
                   sta VIA1_DDRB         # Make PB0 an output
                   sta VIA1_ORB          # Turn on LED
                   sta LED_STATE         # Remember if LED is on/off
+
+# This is for the clock
+                  stz SECONDS
+                  stz MINUTES
+                  stz HOURS
+                  rts
